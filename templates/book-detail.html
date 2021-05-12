@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{book.title}}</h1>
+<h3>{{isbn}}</h3>
+<img src="{{book.open_library_image_id}}">
+<form action="/users/{{g.user.id}}/books/{{book.id}}" method="post">
+    {% if in_collection %}
+        <button class="btn btn-danger btn-sm" formaction="/users/{{g.user.id}}/books/{{book.id}}/delete" formmethod="post">Remove from collection</button>
+    {% endif %}
+    {% if not in_collection %}
+        <button class="btn btn-success btn-sm">Add to collection</button>
+    {% endif %}
+</form>
+
+
+<p>By {% for author in book.authors %} {{author.name}}, {% endfor %}</p>
+<p>Published: {{book.publish_date}} by {% for publisher in book.publishers %}{{publisher.name}}, {% endfor %}</p>
+<p>Pages: {{book.number_of_pages}}</p>
+
+<h5>Subjects</h5>
+{% for subject in book.subjects %}
+    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+{% endfor %}
+<h5>Places</h5>
+{% for subject in book.subject_places %}
+    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+{% endfor %}
+<h5>People</h5>
+{% for subject in book.subject_people %}
+    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+{% endfor %}
+<h5>Time Periods</h5>
+{% for subject in book.subject_times %}
+    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+{% endfor %}
+
+{% if book_tags %}
+<div id="book-tags">
+    <h5>Tags applied to this book</h5>
+    {% for tag in book_tags %}
+        <button class="btn btn-primary btn-sm m-1" id="{{tag.id}}">{{tag.name}}</button>
+    {% endfor %}
+</div>
+{% endif %}
+{% if available_tags %}
+<div id="available-tags">
+    <h5>Available tags</h5>
+    {% for tag in available_tags %}
+        <button class="btn btn-secondary btn-sm m-1" id="{{tag.id}}">{{tag.name}}</button>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

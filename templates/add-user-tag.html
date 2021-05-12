@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Add a tag</h1>
+<form action="/users/{{user.id}}/tag" method="post">
+    <label for="tag">Tag: </label>
+    <input type="text" name="tag" id="tag">
+    <button>Search</button>
+</form>
+
+{% endblock %}

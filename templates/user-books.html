@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% for book in books %}
+<div class="card">
+  <img src="{{book.open_library_image_id}}" class="card-img-top w-25">
+  <div>
+    <h5 class="card-title">{{book.title}}</h5>
+    {% for author in book.authors %}
+      <p class="card-text">{{author.name}}</p>
+    {% endfor %}
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

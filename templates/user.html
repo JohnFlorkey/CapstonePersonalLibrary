@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<a href="/users/{{user.id}}/books">Browse</a>
+<a href="/users/{{user_id}}/search">Search</a>
+<a href="/logout">Logout</a>
+<form action="/books/search" method="post">
+    <label for="isbn">ISBN: </label>
+    <input type="text" maxlength="13" name="isbn" id="isbn">
+    <button>Search</button>
+</form>
+{% endblock %}

@@ -46,3 +46,23 @@ Aside from the user’s password no sensitive data will be stored.
         1. Might be nice to do the individual inspection with a modal to keep the user on the search result page
 #### What makes this more than CRUD
 The ability to define and then search on the user defined tags is what makes this app more useful than simply using Open Libary’s website. Making the creation, application and searching of the tags easy will be a primary goal.
+
+### Routes
+* GET /  - landing page. provides options to signup or login
+* GET,POST /Signup  
+* GET /Login  
+* GET /Logout  
+* GET /users/user_id      - user's landing page, links to browse, search, add. This may turn into the nav  
+* GET /books/search?isbn  - lookup book in database, server will call external api if not in database,
+* GET /books/book_id      - details about a book not in a user's collection
+* GET /users/user_id/books     - all books in user's collection
+* GET /users/user_id/books/book_id     - details for a specific book in user's collection
+* POST /users/user_id/books/book_id    - add book to user's collection
+* POST /users/user_id/books/book_id/delete        - remove book from user's collection
+* GET /users/user_id/tags             - see all tags the user has created
+* GET /users/user_id/tag          - show the create tag form
+* POST /users/user_id/tag         - create a new tag
+* POST /users/user_id/books/book_id/tag/tag_id   - add user tag to book, this should be ajax call so user doesn't have to leave the page
+* DELETE /users/user_id/books/book_id/tag/tag_id      - remove tag from book, this should be an ajax call so user doesn't have to leave the page
+* GET /users/user_id/tags/tag_id      - displays all books with that tag
+* DELETE /users/user_id/tags/tag_id   - delete a tag
