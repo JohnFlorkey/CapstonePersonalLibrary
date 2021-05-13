@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template, redirect, session, g, flash, jsonify
+from flask import Flask, request, render_template, redirect, session, g, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, Book, User, UserBook, Tag, UserTag, UserBookTag
 from forms import UserForm
@@ -14,7 +14,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 toolbar = DebugToolbarExtension(app)
 
@@ -52,7 +52,8 @@ def home():
     """Redirect the user to the appropriate route based on whether or not they are logged in."""
 
     if g.user:
-        return render_template('user.html', user=g.user)
+        return redirect(f'/users/{g.user.id}/books')
+
     else:
         return render_template('home-anon.html')
 
@@ -62,9 +63,6 @@ def signup():
     """Sign up a user."""
 
     form = UserForm()
-
-    import pdb
-    pdb.set_trace()
 
     if form.validate_on_submit():
         user = User.signup(
@@ -77,7 +75,7 @@ def signup():
 
         return redirect('/')
 
-    return render_template('signup.html', form=form)
+    return render_template('signup.html', form=form, user=g.user)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -95,7 +93,7 @@ def login():
             do_login(user)
             return redirect('/')
 
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, user=g.user)
 
 
 @app.route('/logout')
@@ -112,11 +110,13 @@ def logout():
 def user_home(user_id):
     """Displays the user's main page."""
 
-    if g.user.id != user_id:
+    if g.user:
+        if g.user.id != user_id:
+            flash("You are not authorized.", "danger")
+    else:
         flash("You are not authorized.", "danger")
-        return redirect('/')
 
-    return render_template('user.html', user=g.user)
+    return redirect('/')
 
 
 @app.route('/books/search', methods=['POST'])
@@ -129,13 +129,14 @@ def search_isbn():
     database.
     """
 
-    isbn = request.form.get('isbn')
-    if g.user:
-        user = g.user
+    if not g.user:
+        flash("You are not authorized.", "danger")
+        return redirect('/')
 
+    isbn = request.form.get('isbn')
     book = Book.query.filter_by(isbn=isbn).first()
     if book:
-        if user.id in book.users:
+        if g.user.id in book.users:
             return redirect('/users/{user_id}/books/{book_id}')
     else:
         resp = lookup_isbn_open_library(isbn)
@@ -147,33 +148,41 @@ def search_isbn():
 
 @app.route('/books/<int:book_id>', methods=['GET', 'POST'])
 def book_detail(book_id):
+    """Show the searched books information."""
+
+    if not g.user:
+        flash("You are not authorized.", "danger")
+        return redirect('/')
+
     book = Book.query.get(book_id)
 
-    return render_template('book-detail.html', book=book)
+    return render_template('book-detail.html', user=g.user, book=book)
 
 
 @app.route('/users/<int:user_id>/books', methods=['GET'])
 def user_books(user_id):
-    """Show the user's 10 most recently added books."""
+    """Show the books in the user's collection."""
 
-    import pdb
-    pdb.set_trace()
+    if not g.user:
+        flash("You are not authorized.", "danger")
+        return redirect('/')
 
     if g.user.id != user_id:
         flash('You are not authorized!', 'danger')
         return redirect('/')
 
-    if len(g.user.books) == 0:
-        return redirect('/')
-
     books = db.session.query(Book).join(UserBook).filter(UserBook.user_id == user_id).all()
 
-    return render_template('user-books.html', books=books)
+    return render_template('user-books.html', user=g.user, books=books)
 
 
 @app.route('/users/<int:user_id>/books/<int:book_id>', methods=['GET', 'POST'])
 def user_book_detail(user_id, book_id):
     """Add a book to the user's collection or display the book that is already in the user's collection."""
+
+    if not g.user:
+        flash("You are not authorized.", "danger")
+        return redirect('/')
 
     if g.user.id != user_id:
         flash('You are not authorized!', 'danger')
@@ -185,31 +194,17 @@ def user_book_detail(user_id, book_id):
         return redirect('/')
 
     if request.method == 'GET':
-        import pdb
-        pdb.set_trace()
-
-        in_collection = book_id in [user_book.id for user_book in g.user.books]
         # Get the tags applied to this book by this user
-        book_tags = db.session.query(Tag) \
-            .join(UserBookTag) \
-            .filter(
-            UserBookTag.user_id == user_id,
-            UserBookTag.book_id == book_id
-            ) \
-            .all()
-        all_tags = db.session.query(Tag) \
-            .join(UserTag) \
-            .filter(UserTag.user_id == user_id) \
-            .all()
-        available_tags = [tag for tag in all_tags if tag not in book_tags]
+        book_tags = book.get_user_book_tags(user_id)
+        # Get all the tags created by the user, except those applied to this book
+        available_tags = [tag for tag in g.user.tags if tag not in book_tags]
 
         return render_template(
             'book-detail.html',
             book=book,
             user=g.user,
             book_tags=book_tags,
-            available_tags=available_tags,
-            in_collection=in_collection
+            available_tags=available_tags
         )
 
     if request.method == 'POST':
@@ -290,33 +285,51 @@ def add_user_tag(user_id):
         return redirect(f'/users/{g.user.id}/tags')
 
 
-@app.route('/users/<int:user_id>/books/<int:book_id>/tags/<int:tag_id>', methods=['POST', 'DELETE'])
+@app.route('/users/<int:user_id>/books/<int:book_id>/tags/<int:tag_id>', methods=['POST'])
 def add_book_tag(user_id, book_id, tag_id):
     """Add a tag to a book in a user's collection."""
-
+    import pdb
+    pdb.set_trace()
     user_books = db.session.query(Book).join(UserBook).filter(UserBook.user_id == user_id).all()
     if book_id not in [book.id for book in user_books]:
-        return jsonify(False)
+        flash('Book not found!', 'danger')
+        return redirect(request.referrer)
 
     user_tags = db.session.query(Tag).join(UserTag).filter(UserTag.user_id == user_id).all()
     if tag_id not in [tag.id for tag in user_tags]:
-        return jsonify(False)
+        flash('Tag not found!', 'danger')
+        return redirect(request.referrer)
 
-    if request.method == 'POST':
-        book_tag = UserBookTag(
-            user_id=user_id,
-            book_id=book_id,
-            tag_id=tag_id
-        )
-        db.session.add(book_tag)
-        db.session.commit()
+    book_tag = UserBookTag(
+        user_id=user_id,
+        book_id=book_id,
+        tag_id=tag_id
+    )
+    db.session.add(book_tag)
+    db.session.commit()
 
-    if request.method == 'DELETE':
-        user_book_tag = UserBookTag.query.filter_by(user_id=user_id, book_id=book_id, tag_id=tag_id).first()
-        db.session.delete(user_book_tag)
-        db.session.commit()
+    return redirect(request.referrer)
 
-    return jsonify(True)
+
+@app.route('/users/<int:user_id>/books/<int:book_id>/tags/<int:tag_id>/delete', methods=['POST'])
+def delete_book_tag(user_id, book_id, tag_id):
+    """Remove a tag from a book in the user's collection."""
+
+    user_books = db.session.query(Book).join(UserBook).filter(UserBook.user_id == user_id).all()
+    if book_id not in [book.id for book in user_books]:
+        flash('Book not found!', 'danger')
+        return redirect(request.referrer)
+
+    user_tags = db.session.query(Tag).join(UserTag).filter(UserTag.user_id == user_id).all()
+    if tag_id not in [tag.id for tag in user_tags]:
+        flash('Tag not found!', 'danger')
+        return redirect(request.referrer)
+
+    user_book_tag = UserBookTag.query.filter_by(user_id=user_id, book_id=book_id, tag_id=tag_id).first()
+    db.session.delete(user_book_tag)
+    db.session.commit()
+
+    return redirect(request.referrer)
 
 
 @app.route('/users/<int:user_id>/tags/<int:tag_id>')
@@ -328,4 +341,4 @@ def show_user_book_by_tag(user_id, tag_id):
         .filter(UserBookTag.user_id == user_id, UserBookTag.tag_id == tag_id)\
         .all()
 
-    return render_template('user-books.html', books=books)
+    return render_template('user-books.html', user=g.user, books=books)

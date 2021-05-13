@@ -55,7 +55,7 @@ The ability to define and then search on the user defined tags is what makes thi
 * GET /users/user_id      - user's landing page, links to browse, search, add. This may turn into the nav  
 * GET /books/search?isbn  - lookup book in database, server will call external api if not in database,
 * GET /books/book_id      - details about a book not in a user's collection
-* GET /users/user_id/books     - all books in user's collection
+* GET /users/user_id/books     - get all books (alphabetically) in user's collection
 * GET /users/user_id/books/book_id     - details for a specific book in user's collection
 * POST /users/user_id/books/book_id    - add book to user's collection
 * POST /users/user_id/books/book_id/delete        - remove book from user's collection

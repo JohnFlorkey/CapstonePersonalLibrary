@@ -79,7 +79,7 @@ class Book(db.Model):
                      unique=True)
     open_library_id = db.Column(db.Text,
                                 nullable=False)
-    open_library_image_id = db.Column(db.Text)
+    open_library_images = db.Column(db.JSON)
     open_library_url = db.Column(db.Text)
     number_of_pages = db.Column(db.Integer)
     publish_date = db.Column(db.Date)
@@ -105,6 +105,21 @@ class Book(db.Model):
     subject_times = db.relationship('SubjectTime',
                                     secondary='books_subject_times',
                                     backref=db.backref('books'))
+
+    def get_authors(self):
+        return ', '.join([author.name for author in self.authors])
+
+    def get_publishers(self):
+        return ', '.join([publisher.name for publisher in self.publishers])
+
+    def get_cover_image_url(self, size):
+        return self.open_library_images.get(size)
+
+    def get_user_book_tags(self, user_id):
+        return db.session.query(Tag)\
+            .join(UserBookTag)\
+            .filter(UserBookTag.user_id == user_id, UserBookTag.book_id == self.id)\
+            .all()
 
 
 class Author(db.Model):

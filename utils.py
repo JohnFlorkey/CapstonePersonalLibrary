@@ -34,7 +34,7 @@ def map_response_to_book(resp, isbn):
     book = Book(
         isbn=isbn,
         open_library_id=data_key.get('key'),
-        open_library_image_id=data_key.get('cover').get('medium') if data_key.get('cover') else None,
+        open_library_images=data_key.get('cover') if data_key.get('cover') else None,
         open_library_url=data_key.get('url'),
         number_of_pages=data_key.get('number_of_pages'),
         publish_date=parse(data_key.get('publish_date'), default=DEFAULT_DATE),
