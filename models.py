@@ -328,7 +328,7 @@ class UserBookTag(db.Model):
                         db.ForeignKey('users.id', ondelete="cascade"),
                         primary_key=True)
     book_id = db.Column(db.Integer,
-                        db.ForeignKey('books.id'),
+                        db.ForeignKey('books.id', ondelete="cascade"),
                         primary_key=True)
     tag_id = db.Column(db.Integer,
                        db.ForeignKey('tags.id'),

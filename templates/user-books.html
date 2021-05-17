@@ -2,34 +2,47 @@
 
 {% block content %}
 
+{% if tag %}
+
+<p>Search results for {{tag.name}}</p>
+<form action="/users/{{user.id}}/tag/{{tag.id}}/delete" method="post">
+  <button class="btn btn-danger">Delete Tag</button>
+</form>
+
+{% endif %}
+
 <div class="container">
-  {% for book in books|sort(attribute='title') %}
-  <div class="card">
-    <div class="row">
-      <div class="col-xl-1 col-md-2 col-sm-3">
-        <a href="/users/{{user.id}}/books/{{book.id}}"><img src="{{book.get_cover_image_url('medium')}}" class="card-img-top"></a>
-      </div>
-      <div class="col">
-        <div class="card-body">
-          <div class="row">
-            <div class="col-3">
-              <h5 class="card-title">{{book.title}}</h5>
-              <p class="card-text">{{book.get_authors()}}</p>
-            </div>
-            <div class="col">
-              <h5>Tags applied to this book</h5>
-              {% for tag in book.get_user_book_tags(user.id) %}
-                <a href="/users/{{user.id}}/tags/{{tag.id}}">
-                  <button class="btn btn-primary btn-sm m-1" id="{{tag.id}}">{{tag.name}}</button>
-                </a>
-              {% endfor %}
+  {% if books %}
+
+    {% for book in books|sort(attribute='title') %}
+    <div class="card">
+      <div class="row">
+        <div class="col-xl-1 col-md-2 col-sm-3">
+          <a href="/users/{{user.id}}/books/{{book.id}}"><img src="{{book.get_cover_image_url('medium')}}" class="card-img-top"></a>
+        </div>
+        <div class="col">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3">
+                <h5 class="card-title">{{book.title}}</h5>
+                <p class="card-text">{{book.get_authors()}}</p>
+              </div>
+              <div class="col">
+                <h5>Tags applied to this book</h5>
+                {% for tag in book.get_user_book_tags(user.id) %}
+                  <a class="btn btn-primary btn-sm m-1" href="/users/{{user.id}}/tags/{{tag.id}}">{{tag.name}}</a>
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  {% endfor %}
+    {% endfor %}
+  {% else %}
+  <h3>You don't have any books in your collection yet!</h3>
+  <h3>Search an ISBN to find a book to add to your collection.</h3>
+  {% endif %}
 </div>
 
 {% endblock %}

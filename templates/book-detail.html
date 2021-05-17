@@ -31,12 +31,12 @@
     <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
 {% endfor %}
 
-{% if available_tags %}
+{% if available_tags or book_tags %}
 <div id="book-tags">
     <h5>Tags applied to this book</h5>
     <form action="#">
         {% for tag in book_tags %}
-            <button formaction="/users/{{user.id}}/books/{{book.id}}/tags/{{tag.id}}/delete" formmethod="post" class="btn btn-primary btn-sm m-1" id="{{tag.id}}">{{tag.name}}</button>
+            <button formaction="/users/{{user.id}}/books/{{book.id}}/tag/{{tag.id}}/delete" formmethod="post" class="btn btn-primary btn-sm m-1" id="{{tag.id}}">{{tag.name}}</button>
         {% endfor %}
     </form>
 </div>
@@ -44,7 +44,7 @@
     <h5>Available tags</h5>
     <form action="#">
         {% for tag in available_tags %}
-            <button formaction="/users/{{user.id}}/books/{{book.id}}/tags/{{tag.id}}" formmethod="post" class="btn btn-secondary btn-sm m-1" id="{{tag.id}}">{{tag.name}}</button>
+            <button formaction="/users/{{user.id}}/books/{{book.id}}/tag/{{tag.id}}" formmethod="post" class="btn btn-secondary btn-sm m-1" id="{{tag.id}}">{{tag.name}}</button>
         {% endfor %}
     </form>
 </div>

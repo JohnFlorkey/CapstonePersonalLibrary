@@ -3,14 +3,26 @@
 {% block content %}
 
 <h1>Tags</h1>
+
+<form action="/users/{{user.id}}/tag" method="post">
+    <input type="text" name="tag" id="tag" placeholder="Tag Name">
+    <button class="btn btn-success btn-sm m-1">Add new tag</button>
+</form>
+
 <div>
-    {% for tag in user.tags|sort(attribute='name') %}
+    {% if user.tags %}
 
-    <a href="/users/{{user.id}}/tags/{{tag.id}}" class="btn btn-primary btn-sm m-1">{{tag.name}}</a>
+        {% for tag in user.tags|sort(attribute='name') %}
 
-    {% endfor %}
+        <a href="/users/{{user.id}}/tags/{{tag.id}}" class="btn btn-primary btn-sm m-1">{{tag.name}}</a>
+
+        {% endfor %}
+
+    {% else %}
+
+        <h3>You have not created any tags yet.</h3>
+
+    {% endif %}
 </div>
-
-<a href="/users/{{user.id}}/tag" class="btn btn-success btn-sm m-1">Add new tag</a>
 
 {% endblock %}
