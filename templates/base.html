@@ -15,9 +15,7 @@
 		<a class="nav-link text-white" href="/">Home</a>
 		{% if user %}
 			<a class="nav-link text-white" href="/users/{{user.id}}/books">Browse Collection</a>
-			<a class="nav-link text-white" href="/users/{{user.id}}/tags">Search By Tag</a>
-<!--			<a class="nav-link text-white" href="/books">ISBN Search</a>-->
-			<a class="nav-link text-white" href="/users/{{user.id}}/tag">Add Tag</a>
+			<a class="nav-link text-white" href="/users/{{user.id}}/tags">Browse Tags</a>
 			<form action="/books/search" method="post" id="isbn-search">
 				<input type="text" maxlength="13" name="isbn" id="isbn" placeholder="ISBN">
 				<button class="btn btn-dark">Search</button>
