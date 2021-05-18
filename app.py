@@ -52,50 +52,59 @@ def do_logout():
 def signup():
     """Sign up a user."""
 
-    # import pdb
-    # pdb.set_trace()
-
     # if there is a user logged ask them to logout before creating a new user
     if g.user:
         flash("Please logout before creating a new account", "danger")
         return redirect('/')
 
-    form = UserForm()
+    signup_form = UserForm()
+    login_form = UserForm()
 
-    if form.validate_on_submit():
+    if signup_form.validate_on_submit():
         try:
             user = User.signup(
-                username=form.username.data,
-                password=form.password.data
+                username=signup_form.username.data,
+                password=signup_form.password.data
             )
             db.session.commit()
         except IntegrityError:
             flash("Username already taken", "danger")
-            return render_template('signup.html', form=form)
+            return render_template('home-anon.html', login_form=login_form, signup_form=signup_form)
 
         do_login(user)
 
         return redirect('/')
+    else:
+        for errors in signup_form.errors.values():
+            for error in errors:
+                flash(error, "danger")
 
-    return render_template('signup.html', form=form)
+    return render_template('home-anon.html', login_form=login_form, signup_form=signup_form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Log the user in."""
 
-    form = UserForm()
+    login_form = UserForm()
 
-    if form.validate_on_submit():
+    if login_form.validate_on_submit():
         user = User.authenticate(
-            username=form.username.data,
-            password=form.password.data
+            username=login_form.username.data,
+            password=login_form.password.data
         )
         if user:
             do_login(user)
             return redirect('/')
+        else:
+            flash("Invalid username or password", "danger")
+    else:
+        for errors in login_form.errors.values():
+            for error in errors:
+                flash(error, "danger")
 
-    return render_template('login.html', form=form, user=g.user)
+    signup_form = UserForm()
+    return render_template('home-anon.html', login_form=login_form, signup_form=signup_form)
 
 
 @app.route('/logout')
@@ -116,7 +125,9 @@ def home():
         return redirect(f'/users/{g.user.id}/books')
 
     else:
-        return render_template('home-anon.html')
+        login_form = UserForm()
+        signup_form = UserForm()
+        return render_template('home-anon.html', login_form=login_form, signup_form=signup_form)
 
 
 # @app.route('/users/<int:user_id>')

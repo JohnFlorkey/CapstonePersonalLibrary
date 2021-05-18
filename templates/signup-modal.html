@@ -1,0 +1,28 @@
+<div class="modal" tabindex="-1" id="signupModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Signup</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row justify-content-md-center">
+          <div class="col-md-7 col-lg-5">
+            <form action="/signup" method="POST" id="user_form">
+              {{ signup_form.hidden_tag() }}
+
+              {% for field in signup_form if field.widget.input_type != 'hidden' %}
+                {% for error in field.errors %}
+                  <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+                {{ field(placeholder=field.label.text, class="form-control") }}
+              {% endfor %}
+
+              <button class="btn btn-primary btn-block btn-lg m-1">Sign Me Up!</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

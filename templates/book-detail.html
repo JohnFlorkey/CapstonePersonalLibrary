@@ -1,53 +1,63 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>{{book.title}}</h1>
-<img src="{{book.get_cover_image_url('medium')}}">
-<form action="/users/{{g.user.id}}/books/{{book.id}}" method="post">
-    {% if book in g.user.books %}
-        <button class="btn btn-danger btn-sm" formaction="/users/{{g.user.id}}/books/{{book.id}}/delete" formmethod="post">Remove from collection</button>
-    {% else %}
-        <button class="btn btn-success btn-sm">Add to collection</button>
-    {% endif %}
-</form>
-
-<p>By {{book.get_authors()}}</p>
-<p>Published {{book.publish_date}} by {{book.get_publishers()}}</p>
-<p>Pages: {{book.number_of_pages}}</p>
-<p>ISBN: {{book.isbn}}</p>
-<h5>Subjects</h5>
-{% for subject in book.subjects %}
-    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
-{% endfor %}
-<h5>Places</h5>
-{% for subject in book.subject_places %}
-    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
-{% endfor %}
-<h5>People</h5>
-{% for subject in book.subject_people %}
-    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
-{% endfor %}
-<h5>Time Periods</h5>
-{% for subject in book.subject_times %}
-    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
-{% endfor %}
-
-{% if available_tags or book_tags %}
-<div id="book-tags">
-    <h5>Tags applied to this book</h5>
-    <form action="#">
-        {% for tag in book_tags %}
-            <button formaction="/users/{{user.id}}/books/{{book.id}}/tag/{{tag.id}}/delete" formmethod="post" class="btn btn-primary btn-sm m-1" id="{{tag.id}}">{{tag.name}}</button>
-        {% endfor %}
-    </form>
+<div class="container mx-3">
+    <div class="row">
+        <h1>{{book.title}}</h1>
+        <div class="col-sm-12 col-md-4">
+            <img src="{{book.get_cover_image_url('medium')}}">
+            <form action="/users/{{g.user.id}}/books/{{book.id}}" method="post">
+                {% if book in g.user.books %}
+                    <button class="btn btn-danger btn-sm m-1" formaction="/users/{{g.user.id}}/books/{{book.id}}/delete" formmethod="post">Remove from collection</button>
+                {% else %}
+                    <button class="btn btn-success btn-sm m-1">Add to collection</button>
+                {% endif %}
+            </form>
+            <p>By {{book.get_authors()}}</p>
+            <p>Published {{book.publish_date}} by {{book.get_publishers()}}</p>
+            <p>Pages: {{book.number_of_pages}}</p>
+            <p>ISBN: {{book.isbn}}</p>
+        </div>
+        <div class="col">
+            {% if available_tags or book_tags %}
+            <div id="book-tags">
+                <h5>Tags applied to this book</h5>
+                <form action="#">
+                    {% for tag in book_tags %}
+                        <button formaction="/users/{{user.id}}/books/{{book.id}}/tag/{{tag.id}}/delete" formmethod="post" class="btn btn-primary btn-sm m-1" id="{{tag.id}}">{{tag.name}}</button>
+                    {% endfor %}
+                </form>
+            </div>
+            <div id="available-tags">
+                <h5>Available tags</h5>
+                <form action="#">
+                    {% for tag in available_tags %}
+                        <button formaction="/users/{{user.id}}/books/{{book.id}}/tag/{{tag.id}}" formmethod="post" class="btn btn-secondary btn-sm m-1" id="{{tag.id}}">{{tag.name}}</button>
+                    {% endfor %}
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        <div class="row">
+            <div class="col">
+                <h5>Subjects</h5>
+                {% for subject in book.subjects %}
+                    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+                {% endfor %}
+                <h5>Places</h5>
+                {% for subject in book.subject_places %}
+                    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+                {% endfor %}
+                <h5>People</h5>
+                {% for subject in book.subject_people %}
+                    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+                {% endfor %}
+                <h5>Time Periods</h5>
+                {% for subject in book.subject_times %}
+                    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 </div>
-<div id="available-tags">
-    <h5>Available tags</h5>
-    <form action="#">
-        {% for tag in available_tags %}
-            <button formaction="/users/{{user.id}}/books/{{book.id}}/tag/{{tag.id}}" formmethod="post" class="btn btn-secondary btn-sm m-1" id="{{tag.id}}">{{tag.name}}</button>
-        {% endfor %}
-    </form>
-</div>
-{% endif %}
 
 {% endblock %}

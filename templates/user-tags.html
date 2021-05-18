@@ -1,28 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<h1>Tags</h1>
-
-<form action="/users/{{user.id}}/tag" method="post">
-    <input type="text" name="tag" id="tag" placeholder="Tag Name">
-    <button class="btn btn-success btn-sm m-1">Add new tag</button>
-</form>
-
-<div>
-    {% if user.tags %}
-
-        {% for tag in user.tags|sort(attribute='name') %}
-
-        <a href="/users/{{user.id}}/tags/{{tag.id}}" class="btn btn-primary btn-sm m-1">{{tag.name}}</a>
-
-        {% endfor %}
-
-    {% else %}
-
-        <h3>You have not created any tags yet.</h3>
-
-    {% endif %}
+<div class="container">
+    <div class="row mt-3">
+        <div class="col-3">
+            <form action="/users/{{user.id}}/tag" method="post">
+                <input type="text" name="tag" id="tag" placeholder="Tag Name">
+                <button class="btn btn-success btn-sm m-1">Add new tag</button>
+            </form>
+        </div>
+        <div class="col">
+            {% if user.tags %}
+                {% for tag in user.tags|sort(attribute='name') %}
+                <a href="/users/{{user.id}}/tags/{{tag.id}}" class="btn btn-primary btn-sm m-1">{{tag.name}}</a>
+                {% endfor %}
+            {% else %}
+                <h3>You have not created any tags yet.</h3>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 {% endblock %}
