@@ -5,7 +5,7 @@ from unittest import TestCase
 from models import db, Book, Author, Publisher, Subject, SubjectPlace, SubjectPerson, SubjectTime, BookAuthor, \
     BookPublisher, BookSubject, BookSubjectPlace, BookSubjectPerson, BookSubjectTime
 
-os.environ['DATABASE_URL'] = "postgresql:///personal_library_test"
+os.environ['DATABASE_URL'] = "postgres:///personal_library_test"
 os.environ['FLASK_ENV'] = "production"
 
 from app import app

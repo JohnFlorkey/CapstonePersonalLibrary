@@ -6,7 +6,7 @@ from models import db, User, Book, Author, Publisher, Subject, SubjectPlace, Sub
     BookPublisher, BookSubject, BookSubjectPlace, BookSubjectPerson, BookSubjectTime, UserBook, Tag, UserTag, \
     UserBookTag
 
-os.environ['DATABASE_URL'] = "postgresql:///personal_library_test"
+os.environ['DATABASE_URL'] = "postgres:///personal_library_test"
 os.environ['FLASK_ENV'] = "production"
 
 from app import app, CURR_USER_KEY
@@ -171,7 +171,7 @@ class UserBookTagViewTestCase(TestCase):
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('Sign up or Login to start managing your book collection', html)
+            self.assertIn('Welcome to Personal Library', html)
 
     def test_home_logged_in(self):
         """When there is a user logged in redirect to the user's books page."""
@@ -780,7 +780,7 @@ class UserBookTagViewTestCase(TestCase):
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn(f'<button formaction="/users/{self.user.id}/books/{self.book.id}/tag/{tag.id}/delete" formmethod="post" class="btn btn-primary btn-sm m-1" id="{tag.id}">{tag.name}</button>', html)
+            self.assertIn(f'<button formaction="/users/{self.user.id}/books/{self.book.id}/tag/{tag.id}/delete" formmethod="post" class="btn btn-primary btn-sm m-1" id="{tag.id}"><span class="bi bi-dash-square-fill"></span> {tag.name}</button>', html)
 
     def test_delete_book_tag_not_logged_in(self):
         """If there is no logged in user, flash a message and redirect to the root route."""
@@ -1001,6 +1001,88 @@ class UserBookTagViewTestCase(TestCase):
                 s[CURR_USER_KEY] = self.user.id
 
             resp = c.get(url, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("epic fake book title", html)
+
+    def test_user_books_search_by_title_not_logged_in(self):
+        """If there is no logged in user, flash a message and redirect to the root route."""
+
+        self.create_user_book()
+
+        url = f'/users/{self.user.id}/books/search'
+
+        with app.test_client() as c:
+            with c.session_transaction() as s:
+                if s.get(CURR_USER_KEY):
+                    del s[CURR_USER_KEY]
+
+            resp = c.post(url, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("You are not authorized.", html)
+
+    def test_user_books_search_by_title_wrong_user(self):
+        """
+        If the book id in the route does not match a book in the collection of the logged in user,
+        flash a message and redirect to the root route.
+        """
+
+        self.create_user_book()
+
+        url = f'/users/0/books/search'
+
+        with app.test_client() as c:
+            with c.session_transaction() as s:
+                s[CURR_USER_KEY] = self.user.id
+
+            resp = c.post(url, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("You are not authorized.", html)
+
+    def test_user_book_search_by_title(self):
+        """Book(s) in the user's collection containing the search string should appear on the results page."""
+
+        self.create_user_book()
+
+        url = f'/users/{self.user.id}/books/search'
+
+        data = {
+            "search_field": "title",
+            "search_string": "epic fake"
+        }
+
+        with app.test_client() as c:
+            with c.session_transaction() as s:
+                s[CURR_USER_KEY] = self.user.id
+
+            resp = c.post(url, data=data, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("epic fake book title", html)
+
+    def test_user_book_search_by_isbn(self):
+        """If there is a book with the matching isbn, then it is displayed on the results page."""
+
+        self.create_user_book()
+
+        url = f'/users/{self.user.id}/books/search'
+
+        data = {
+            "search_field": "isbn",
+            "search_string": "1111111111111"
+        }
+
+        with app.test_client() as c:
+            with c.session_transaction() as s:
+                s[CURR_USER_KEY] = self.user.id
+
+            resp = c.post(url, data=data, follow_redirects=True)
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)

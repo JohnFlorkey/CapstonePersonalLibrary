@@ -3,7 +3,7 @@ from flask import Flask, request, render_template, redirect, session, g, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, Book, User, UserBook, Tag, UserTag, UserBookTag
 from forms import UserForm
-from utils import lookup_isbn_open_library, map_response_to_book
+from utils import lookup_isbn_open_library, map_response_to_book, search_user_books
 from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
@@ -130,19 +130,6 @@ def home():
         return render_template('home-anon.html', login_form=login_form, signup_form=signup_form)
 
 
-# @app.route('/users/<int:user_id>')
-# def user_home(user_id):
-#     """Displays the user's main page."""
-#
-#     if g.user:
-#         if g.user.id != user_id:
-#             flash("You are not authorized.", "danger")
-#     else:
-#         flash("You are not authorized.", "danger")
-#
-#     return redirect('/')
-
-
 @app.route('/books/search', methods=['POST'])
 def search_isbn():
     """
@@ -196,6 +183,26 @@ def user_books(user_id):
         return redirect('/')
 
     books = db.session.query(Book).join(UserBook).filter(UserBook.user_id == user_id).all()
+
+    return render_template('user-books.html', user=g.user, books=books)
+
+
+@app.route('/users/<int:user_id>/books/search', methods=['POST'])
+def user_books_search(user_id):
+    """Search the user's collection."""
+
+    if not g.user:
+        flash("You are not authorized.", "danger")
+        return redirect('/')
+
+    if g.user.id != user_id:
+        flash('You are not authorized.', 'danger')
+        return redirect('/')
+
+    search_field = request.form.get('radio-search')
+    search_string = request.form.get('search-input')
+
+    books = search_user_books(user_id, search_field, search_string)
 
     return render_template('user-books.html', user=g.user, books=books)
 
@@ -306,11 +313,21 @@ def add_user_tag(user_id):
     if request.method == 'POST':
         tag_name = request.form.get('tag')
         tag = Tag.query.filter_by(name=tag_name).first()
+        """
+        if the tag exists in the application and is in the user's collection flash a message and return the user's
+        tag page.
+        """
+        if tag:
+            if tag.id in [user_tag.id for user_tag in g.user.tags]:
+                flash("Tag already in user's collection", "success")
+                return redirect(f'/users/{g.user.id}/tags')
+
+        # if the tag does not exist in the application, create it
         if not tag:
             tag = Tag(name=tag_name)
             db.session.add(tag)
             db.session.commit()
-
+        # add the tag to the user's collection
         user_tag = UserTag(
             user_id=g.user.id,
             tag_id=tag.id

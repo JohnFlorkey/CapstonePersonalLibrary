@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
+
 {% if tag %}
   <h5 class="fs-5 my-3">Books with the tag: {{tag.name}}</h5>
   <form class="mb-3" action="/users/{{user.id}}/tag/{{tag.id}}/delete" method="post">
@@ -9,6 +9,28 @@
     <span>Deleting the tag will remove the tag from all books and your tag list.</span>
   </form>
 {% endif %}
+
+  <form action="/users/{{g.user.id}}/books/search" method="post">
+    <div class="row">
+      <div class="col-2">Search collection by:</div>
+      <div class="col">
+        <div class="form-check-inline">
+          <input class="form-check-input" type="radio" name="radio-search" id="radio-title" value="title" checked>
+          <label class="form-check-label" for="radio-title">Title</label>
+        </div>
+        <div class="form-check-inline">
+          <input class="form-check-input" type="radio" name="radio-search" id="radio-isbn" value="isbn">
+          <label class="form-check-label" for="radio-title">ISBN</label>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        <input class="form-control" type="text" name="search-input" id="search-input">
+      </div>
+      <button class="btn btn-primary col-1">Search</button>
+    </div>
+  </form>
 
 {% if books %}
   {% for book in books|sort(attribute='title') %}
@@ -26,7 +48,7 @@
             </div>
             <div class="col">
               <h5>Tags applied to this book</h5>
-              {% for tag in book.get_user_book_tags(user.id) %}
+              {% for tag in book.get_user_book_tags(user.id)|sort(attribute='name') %}
                 <a class="btn btn-primary btn-sm m-1" href="/users/{{user.id}}/tags/{{tag.id}}">{{tag.name}}</a>
               {% endfor %}
             </div>
@@ -40,6 +62,5 @@
 <h3 class="text-center m-3">You don't have any books in your collection yet!</h3>
 <h3 class="text-center m-3">Search an ISBN to find a book to add to your collection.</h3>
 {% endif %}
-</div>
 
 {% endblock %}

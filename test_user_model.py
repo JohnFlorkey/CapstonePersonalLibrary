@@ -5,7 +5,7 @@ from unittest import TestCase
 import sqlalchemy.exc
 from models import db, User
 
-os.environ['DATABASE_URL'] = "postgresql:///personal_library_test"
+os.environ['DATABASE_URL'] = "postgres:///personal_library_test"
 os.environ['FLASK_ENV'] = "production"
 
 from app import app

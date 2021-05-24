@@ -6,7 +6,7 @@ from flask import g
 
 from models import db, User
 
-os.environ['DATABASE_URL'] = "postgresql:///personal_library_test"
+os.environ['DATABASE_URL'] = "postgres:///personal_library_test"
 os.environ['FLASK_ENV'] = "production"
 
 from app import app, CURR_USER_KEY, do_login, do_logout
@@ -55,7 +55,7 @@ class AuthenticationViewTestCase(TestCase):
             resp = c.get('/signup')
             html = resp.get_data(as_text=True)
 
-            self.assertIn("Sign me up!", html)
+            self.assertIn("Sign Me Up!", html)
 
     def test_signup_post(self):
         """A post request should create a new user, log that user in and redirect to the root route."""

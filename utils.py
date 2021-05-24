@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 from dateutil.parser import parse
 from flask import flash
-from models import Book, Author, Publisher, Subject, SubjectPlace, SubjectPerson, SubjectTime
+from models import db, Book, Author, Publisher, Subject, SubjectPlace, SubjectPerson, SubjectTime, UserBook
 
 DEFAULT_DATE = datetime(1900, 1, 1)
 
@@ -101,3 +101,15 @@ def map_response_to_book(resp, isbn):
                 book.subject_times.append(subject_time)
 
     return book
+
+
+def search_user_books(user_id, search_field, search_string):
+    """
+    Return books in the specified user's collection searching on the passed in book attribute and search string.
+    """
+    search_query = db.session.query(Book).join(UserBook).filter(UserBook.user_id == user_id)
+    if search_field == 'title':
+        search_query = search_query.filter(Book.title.ilike(f'%{search_string}%'))
+    elif search_field == 'isbn':
+        search_query = search_query.filter(Book.isbn == search_string)
+    return search_query.all()
