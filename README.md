@@ -12,6 +12,18 @@ based on tags that they have created and added to their books.
 * Search the user's collection for all books with a specified tag
 * Remove a tag from all books in the user's collection and from the user's collection of tags
 
+## User workflows
+### Add book to collection
+![Add book to collection flow chart](https://docs.google.com/drawings/d/e/2PACX-1vRYbfW0k3TXgrhJy0aVANCKPef4pMGZjbUa4xZ99NfzVQEPXOBwu8PXhoPIL7Sgz9wblRne5BSLi0aB/pub?w=960&h=720)
+### Add user tag
+![Add user tag](https://docs.google.com/drawings/d/e/2PACX-1vQiYLIj-RBbbMTFfH5w9ieNRlvOqanHSGoFKFdNDKsr3V7nG9doYRO4bilb8kj4qdAXqWmZJMS3dYH_/pub?w=960&h=720)
+### Add tags to books
+![Add tags to book](https://docs.google.com/drawings/d/e/2PACX-1vT8hdzNQrjbO5WtesxjMyzNscKybhwPTTtonQ9-ZldPK2zI9_7nnHizmofRB3URs0YisuH7uQncusJ5/pub?w=960&h=720)
+### Search books by tag
+#### From Browse Tags
+![Search books by tag from browse tags](https://docs.google.com/drawings/d/e/2PACX-1vTxEsPXhXN5NlOL_qvmyPFAE6qf56f1S3UcmzMs1BJ5dDJfPjBBc_-sIDw8tuSKVUdtuluNTD_gERmQ/pub?w=960&h=720)
+
+
 ## Typical Workflow
 1) Create user account
 2) Enter an ISBN of a book in your physical book collection in the ISBN text box on the navigation bar and click the 

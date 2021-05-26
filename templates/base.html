@@ -10,32 +10,38 @@
 <div>
 	<img src="/static/library_002.jpg" class="position-absolute vh-100 vw-100">
 	<div class="container position-relative">
-		{% for category, message in get_flashed_messages(with_categories=True) %}
-		<div class="alert alert-{{ category }}">{{ message }}</div>
-		{% endfor %}
-		<div class="nav nav-justified bg-secondary">
-				<a class="nav-link text-white" href="/">Home</a>
-				{% if user %}
-					<a class="nav-link text-white" href="/users/{{user.id}}/books">Browse Collection</a>
-					<a class="nav-link text-white" href="/users/{{user.id}}/tags">Browse Tags</a>
-					<form action="/books/search" method="post" id="isbn-search">
-						<div class="input-group">
-							<input class="form-control" type="text" maxlength="13" name="isbn" id="isbn" placeholder="ISBN">
-							<button class="btn btn-dark">Lookup</button>
-						</div>
-					</form>
-					<a class="nav-link text-white justify-content-end" href="/logout">Logout</a>
-				{% endif %}
-				{% if not user %}
-					<button type="button" class="btn nav-link text-white" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
-					<button type="button" class="btn nav-link text-white" data-bs-toggle="modal" data-bs-target="#signupModal">Signup</button>
-				{% endif %}
+		<div class="row">
+			{% for category, message in get_flashed_messages(with_categories=True) %}
+			<div class="alert alert-{{ category }} col">{{ message }}</div>
+			{% endfor %}
 		</div>
-		{% if login_form %}	{% include "login-modal.html" %} {% endif %}
-		{% if signup_form %} {% include "signup-modal.html" %} {% endif %}
- 		<div class="bg-white py-1">
-		{% block content %}
-		{% endblock %}
+		<div class="row">
+			<div class="nav nav-justified bg-secondary col">
+					<a class="nav-link text-white" href="/">Home</a>
+					{% if user %}
+						<a class="nav-link text-white" href="/users/{{user.id}}/books">Browse Collection</a>
+						<a class="nav-link text-white" href="/users/{{user.id}}/tags">Browse Tags</a>
+						<form action="/books/search" method="post" id="isbn-search">
+							<div class="input-group">
+								<input class="form-control" type="text" maxlength="13" name="isbn" id="isbn" placeholder="ISBN">
+								<button class="btn btn-dark">Lookup</button>
+							</div>
+						</form>
+						<a class="nav-link text-white justify-content-end" href="/logout">Logout</a>
+					{% endif %}
+					{% if not user %}
+						<button type="button" class="btn nav-link text-white" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+						<button type="button" class="btn nav-link text-white" data-bs-toggle="modal" data-bs-target="#signupModal">Signup</button>
+					{% endif %}
+			</div>
+			{% if login_form %}	{% include "login-modal.html" %} {% endif %}
+			{% if signup_form %} {% include "signup-modal.html" %} {% endif %}
+		</div>
+		<div class="row">
+	        <div class="bg-white py-1 col">
+			{% block content %}
+			{% endblock %}
+			</div>
 		</div>
 	</div>
 </div>

@@ -2,17 +2,19 @@
 
 {% block content %}
 
+<div class="row">
 {% if tag %}
-  <h5 class="fs-5 my-3">Books with the tag: {{tag.name}}</h5>
-  <form class="mb-3" action="/users/{{user.id}}/tag/{{tag.id}}/delete" method="post">
-    <button class="btn btn-danger btn-sm">Delete Tag</button>
-    <span>Deleting the tag will remove the tag from all books and your tag list.</span>
-  </form>
-{% endif %}
-
+  <div class="col">
+    <h5 class="fs-5 my-3">Books with the tag: {{tag.name}}</h5>
+    <form class="mb-3" action="/users/{{user.id}}/tag/{{tag.id}}/delete" method="post">
+      <button class="btn btn-danger btn-sm">Delete Tag</button>
+      <span>Deleting the tag will remove the tag from all books and your tag list.</span>
+    </form>
+  </div>
+{% else %}
   <form action="/users/{{g.user.id}}/books/search" method="post">
     <div class="row">
-      <div class="col-2">Search collection by:</div>
+      <div class="col-6 col-sm-6 col-md-3">Search collection by:</div>
       <div class="col">
         <div class="form-check-inline">
           <input class="form-check-input" type="radio" name="radio-search" id="radio-title" value="title" checked>
@@ -25,38 +27,45 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-3">
-        <input class="form-control" type="text" name="search-input" id="search-input">
+      <div class="col-8 col-lg-4">
+        <input class="form-control" type="text" name="search-input" id="search-input" placeholder="Title or ISBN">
       </div>
-      <button class="btn btn-primary col-1">Search</button>
+      <button class="btn btn-primary col-2 col-lg-1">Search</button>
     </div>
   </form>
+{% endif %}
+</div>
+
 
 {% if books %}
   {% for book in books|sort(attribute='title') %}
-  <div class="card my-1">
-    <div class="row">
-      <div class="col-xl-1 col-md-2 col-sm-3">
-        <a href="/users/{{user.id}}/books/{{book.id}}"><img src="{{book.get_cover_image_url('medium')}}" class="card-img-top"></a>
-      </div>
-      <div class="col">
-        <div class="card-body">
-          <div class="row">
-            <div class="col-3">
-              <h5 class="card-title">{{book.title}}</h5>
-              <p class="card-text">{{book.get_authors()}}</p>
-            </div>
-            <div class="col">
-              <h5>Tags applied to this book</h5>
-              {% for tag in book.get_user_book_tags(user.id)|sort(attribute='name') %}
-                <a class="btn btn-primary btn-sm m-1" href="/users/{{user.id}}/tags/{{tag.id}}">{{tag.name}}</a>
-              {% endfor %}
+<div class="row">
+  <div class="col-8 col-md-12">
+    <div class="card my-1">
+      <div class="row">
+        <div class="col-6 col-md-2">
+          <a href="/users/{{user.id}}/books/{{book.id}}"><img src="{{book.get_cover_image_url('medium')}}" class="card-img-top"></a>
+        </div>
+        <div class="col-12 col-md-10">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-12 col-md-4 col-xl-3">
+                <h5 class="card-title">{{book.title}}</h5>
+                <p class="card-text">{{book.get_authors()}}</p>
+              </div>
+              <div class="col-12 col-md-8 col-xl-9">
+                <h5>Tags applied to this book</h5>
+                {% for tag in book.get_user_book_tags(user.id)|sort(attribute='name') %}
+                  <a class="btn btn-primary btn-sm m-1" href="/users/{{user.id}}/tags/{{tag.id}}">{{tag.name}}</a>
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
   {% endfor %}
 {% else %}
 <h3 class="text-center m-3">You don't have any books in your collection yet!</h3>

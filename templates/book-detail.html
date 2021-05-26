@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="mx-3">
+<h1>{{book.title}}</h1>
     <div class="row">
-        <h1>{{book.title}}</h1>
         <div class="col-sm-12 col-md-6 col-xl-3">
             <img src="{{book.get_cover_image_url('medium')}}" class="img-fluid">
             <form action="/users/{{g.user.id}}/books/{{book.id}}" method="post">
@@ -39,27 +38,25 @@
             </div>
             {% endif %}
         </div>
-        <div class="row">
-            <div class="col">
-                <h5>Subjects</h5>
-                {% for subject in book.subjects|sort(attribute='name') %}
-                    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
-                {% endfor %}
-                <h5>Places</h5>
-                {% for subject in book.subject_places|sort(attribute='name') %}
-                    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
-                {% endfor %}
-                <h5>People</h5>
-                {% for subject in book.subject_people|sort(attribute='name') %}
-                    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
-                {% endfor %}
-                <h5>Time Periods</h5>
-                {% for subject in book.subject_times|sort(attribute='name') %}
-                    <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
-                {% endfor %}
-            </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h5>Subjects</h5>
+            {% for subject in book.subjects|sort(attribute='name') %}
+                <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+            {% endfor %}
+            <h5>Places</h5>
+            {% for subject in book.subject_places|sort(attribute='name') %}
+                <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+            {% endfor %}
+            <h5>People</h5>
+            {% for subject in book.subject_people|sort(attribute='name') %}
+                <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+            {% endfor %}
+            <h5>Time Periods</h5>
+            {% for subject in book.subject_times|sort(attribute='name') %}
+                <button class="btn btn-primary btn-sm m-1">{{subject.name}}</button>
+            {% endfor %}
         </div>
     </div>
-</div>
-
 {% endblock %}
